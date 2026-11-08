@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "sk-concept-9a44b"
+  },
+  "targets": {
+    "sk-concept-9a44b": {
+      "hosting": {
+        "report-card": [
+          "skconcept-report-card"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "hosting": [
+    {
+      "target": "report-card",
+      "public": ".",
+      "ignore": [
+        "firebase.json",
+        ".firebaserc",
+        ".firebase/**",
+        ".playwright-cli/**",
+        "**/node_modules/**",
+        "serve.js",
+        "logo.png",
+        "'",
+        "*.md",
+        "**/*.map"
+      ],
+      "headers": [
+        {
+          "source": "**/*.@(html)",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "no-cache, no-store, must-revalidate"
+            }
+          ]
+        },
+        {
+          "source": "**/*.@(js|png|jpg|jpeg|webp|svg)",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "public, max-age=86400"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

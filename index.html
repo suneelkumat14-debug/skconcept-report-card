@@ -1,0 +1,1541 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>स्मार्ट रिपोर्ट कार्ड जेनरेटर - S.K Concept</title>
+    <link rel="icon" type="image/png" sizes="256x256" href="logo-256.png">
+    <link rel="apple-touch-icon" href="logo-256.png">
+    <style>
+        :root {
+            --primary-color: #1a73e8;
+            --primary-dark: #1557b0;
+            --success-color: #34a853;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --border-color: #cccccc;
+            /* लोगो से लिए गए ब्रांड रंग */
+            --brand-navy: #0b1a3a;
+            --brand-navy-deep: #000c27;
+            --brand-blue: #0a49a7;
+            --brand-gold: #c58f0a;
+            --brand-gold-light: #f7d774;
+            --brand-gold-tint: #fdf7e6;
+            --brand-line: #d6dded;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+            color: var(--text-color);
+        }
+
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+            font-size: 14px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 15px;
+            box-sizing: border-box;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 5px rgba(26, 115, 232, 0.3);
+        }
+
+        .marks-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.3s;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background-color: #5f6368;
+        }
+        .btn-secondary:hover {
+            background-color: #484c50;
+        }
+
+        /* Report Card Styling */
+        #reportCard {
+            display: none;
+            margin-top: 30px;
+            border: 2px solid var(--primary-color);
+            padding: 30px;
+            border-radius: 8px;
+            background: #fff;
+            position: relative;
+        }
+
+        .school-header {
+            text-align: center;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+
+        .student-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+            font-size: 15px;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid var(--border-color);
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: center;
+            font-size: 15px;
+        }
+
+        th {
+            background-color: #f1f3f4;
+            color: #202124;
+        }
+
+        .result-summary {
+            font-size: 15px;
+            margin-top: 15px;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+        }
+
+        .result-summary p {
+            margin: 6px 0;
+            font-weight: bold;
+        }
+
+        .signatures {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px dashed #ccc;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 18px;
+            flex-wrap: wrap;
+        }
+
+        .card-actions button {
+            margin-top: 0;
+            flex: 1 1 200px;
+        }
+
+        .download-status {
+            margin: 10px 0 0;
+            font-size: 14px;
+            font-weight: 600;
+            min-height: 18px;
+        }
+
+        #reportCard.exporting .card-actions,
+        #reportCard.exporting .download-status {
+            display: none;
+        }
+
+        #reportCard.exporting {
+            border-radius: 0;
+        }
+
+        .pdf-btn {
+            background-color: var(--brand-gold);
+            color: #1b1400;
+        }
+        .pdf-btn:hover {
+            background-color: #b07f08;
+        }
+
+        .png-btn {
+            background-color: var(--brand-blue);
+        }
+        .png-btn:hover {
+            background-color: #083a86;
+        }
+        .pdf-btn:disabled {
+            opacity: .7;
+            cursor: progress;
+        }
+
+        .print-btn {
+            background-color: var(--brand-navy);
+        }
+        .print-btn:hover {
+            background-color: var(--brand-navy-deep);
+        }
+
+        @page {
+            size: A4 portrait;
+            margin: 10mm;
+        }
+
+        @media print {
+            body {
+                padding: 0;
+                margin: 0;
+                background: #fff;
+            }
+            .container {
+                padding: 0;
+                box-shadow: none;
+                border-radius: 0;
+                max-width: none;
+                background: #fff;
+            }
+            body * {
+                visibility: hidden;
+            }
+            #reportCard, #reportCard * {
+                visibility: visible;
+            }
+            #reportCard {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                box-sizing: border-box;
+                border: 1.5px solid var(--brand-navy);
+                border-top: 6px solid var(--brand-gold);
+                box-shadow: none;
+                padding: 10px;
+            }
+            #reportCard table {
+                font-size: 12.5px;
+            }
+            #reportCard th, #reportCard td {
+                padding: 6px 8px;
+                font-size: 12.5px;
+            }
+            #reportCard .card-logo {
+                width: 64px;
+                height: 64px;
+            }
+            #reportCard .student-photo-box {
+                width: 80px;
+                flex-basis: 80px;
+                height: 100px;
+            }
+            .print-btn, .btn-group, .card-actions, .download-status {
+                display: none;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .marks-grid, .student-info {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Branding */
+        .brand {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+
+        .brand-logo {
+            width: 108px;
+            height: 108px;
+            border-radius: 16px;
+            display: block;
+            box-shadow: 0 6px 18px rgba(0, 18, 51, 0.28);
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .card-logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 10px;
+            display: block;
+            margin: 0 auto 10px;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        @media (max-width: 600px) {
+            .brand-logo {
+                width: 88px;
+                height: 88px;
+            }
+        }
+
+        /* स्कूल लोगो अपलोड */
+        .logo-upload {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: #f8f9fa;
+            border: 1px dashed #c7ccd4;
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        .logo-thumb {
+            width: 62px;
+            height: 62px;
+            border-radius: 10px;
+            object-fit: contain;
+            background: #0a1a3a;
+            border: 1px solid #d7dbe3;
+            flex: 0 0 auto;
+        }
+
+        .logo-upload-actions {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .upload-label {
+            display: inline-block;
+            background: var(--primary-color);
+            color: #fff;
+            font-weight: bold;
+            font-size: 14px;
+            padding: 9px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 0;
+        }
+
+        .upload-label:hover {
+            background: var(--primary-dark);
+        }
+
+        .logo-remove {
+            display: none;
+            width: auto;
+            background: #fff;
+            color: #b3261e;
+            border: 1px solid #e3b6b2;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .logo-remove:hover {
+            background: #fdecea;
+            color: #b3261e;
+        }
+
+        #logoUpload {
+            display: none;
+        }
+
+        .logo-hint {
+            margin: 8px 0 0;
+            font-size: 12.5px;
+            color: #6b7280;
+        }
+
+        @media (max-width: 600px) {
+            .logo-upload {
+                align-items: flex-start;
+            }
+        }
+
+        /* विषयवार अंक तालिका */
+        .subject-head,
+        .subject-row {
+            display: grid;
+            grid-template-columns: minmax(0, 1.7fr) .72fr .72fr .72fr 36px;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .subject-head {
+            margin-bottom: 6px;
+            padding: 0 2px;
+            font-size: 12.5px;
+            font-weight: bold;
+            color: #555;
+            text-align: center;
+        }
+
+        .subject-head span:first-child {
+            text-align: left;
+        }
+
+        .subject-row {
+            margin-bottom: 8px;
+        }
+
+        .subject-row input {
+            padding: 9px 10px;
+        }
+
+        .subject-row input[type="number"] {
+            text-align: center;
+        }
+
+        .row-remove {
+            width: 36px;
+            height: 36px;
+            padding: 0;
+            border-radius: 6px;
+            background: #fff;
+            color: #b3261e;
+            border: 1px solid #e3b6b2;
+            font-size: 18px;
+            line-height: 1;
+        }
+
+        .row-remove:hover {
+            background: #fdecea;
+            color: #b3261e;
+        }
+
+        .btn-add {
+            width: 100%;
+            margin-top: 4px;
+            background: #eef4fe;
+            color: var(--primary-dark);
+            border: 1px dashed #9dbdf0;
+        }
+
+        .btn-add:hover {
+            background: #e2ecfd;
+        }
+
+        .subject-hint {
+            margin: 0 0 10px;
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        /* छात्र फ़ोटो */
+        .photo-upload {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            background: #f8f9fa;
+            border: 1px dashed #c7ccd4;
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        .photo-frame {
+            width: 68px;
+            height: 84px;
+            border-radius: 8px;
+            border: 1px solid #d7dbe3;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #9aa1ab;
+            font-size: 11px;
+            text-align: center;
+            overflow: hidden;
+            flex: 0 0 auto;
+        }
+
+        .photo-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        #studentPhotoInput {
+            display: none;
+        }
+
+        .student-block {
+            display: flex;
+            gap: 16px;
+            align-items: stretch;
+            margin-bottom: 20px;
+        }
+
+        .student-block .student-info {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .student-photo-box {
+            width: 96px;
+            flex: 0 0 96px;
+            height: 118px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+            background: #f8f9fa;
+            display: none;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .student-photo-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        @media (max-width: 600px) {
+            .subject-row {
+                grid-template-columns: 1fr 1fr 1fr 36px;
+            }
+
+            .sub-name {
+                grid-column: 1 / -1;
+            }
+
+            .subject-head {
+                display: none;
+            }
+
+            .student-block {
+                flex-direction: column-reverse;
+            }
+
+            .student-photo-box {
+                align-self: center;
+            }
+        }
+        /* ===== मार्कशीट थीम (लोगो के रंगों से) ===== */
+        #reportCard {
+            border: 2px solid var(--brand-navy);
+            border-top: 7px solid var(--brand-gold);
+            box-shadow: 0 10px 26px rgba(0, 12, 39, 0.14);
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        #reportCard .school-header {
+            border-bottom: 3px double var(--brand-navy);
+            padding-bottom: 14px;
+        }
+
+        #reportCard .card-logo {
+            box-shadow: 0 4px 12px rgba(0, 12, 39, 0.25);
+        }
+
+        #reportCard #cardSchoolName {
+            color: var(--brand-navy) !important;
+        }
+
+        #reportCard #cardExamTerm {
+            color: var(--brand-blue) !important;
+        }
+
+        #reportCard .student-info {
+            background: var(--brand-gold-tint);
+            border: 1px solid #ecd9a6;
+        }
+
+        #reportCard .student-info strong {
+            color: var(--brand-navy);
+        }
+
+        #reportCard .student-photo-box {
+            border: 2px solid var(--brand-gold);
+        }
+
+        #reportCard table,
+        #reportCard th,
+        #reportCard td {
+            border-color: var(--brand-line);
+        }
+
+        #reportCard thead th {
+            background: var(--brand-navy);
+            color: var(--brand-gold-light);
+            border-color: var(--brand-navy);
+            font-weight: 700;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        #reportCard tbody tr:nth-child(even) td {
+            background: #f9fbff;
+        }
+
+        #reportCard tbody td:nth-child(5) {
+            color: var(--brand-navy);
+            font-weight: 700;
+        }
+
+        #reportCard tbody td:nth-child(6) {
+            color: var(--brand-blue);
+            font-weight: 600;
+        }
+
+        #reportCard .result-summary {
+            background: var(--brand-gold-tint);
+            border-left: 5px solid var(--brand-gold);
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        #reportCard .result-summary p {
+            color: #22314f;
+        }
+
+        #reportCard #cardTotal,
+        #reportCard #cardPercentage,
+        #reportCard #cardGrade {
+            color: var(--brand-navy);
+        }
+
+        #reportCard .signatures {
+            border-top: 1px dashed #cbb98a;
+            color: var(--brand-navy);
+        }
+
+        #reportCard .print-btn {
+            background: var(--brand-navy);
+        }
+
+        #reportCard .print-btn:hover {
+            background: var(--brand-navy-deep);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="brand">
+        <img src="logo-512.png" alt="S.K Concept Logo" class="brand-logo js-school-logo">
+    </div>
+    <h2>स्मार्ट रिपोर्ट कार्ड और परीक्षा परिणाम जेनरेटर</h2>
+    
+    <!-- स्कूल चयन और सेव करने का विकल्प -->
+    <div class="form-group">
+        <label for="schoolSelect">स्कूल / संस्थान चुनें:</label>
+        <select id="schoolSelect" onchange="handleSchoolSelection()">
+            <option value="S.K Concept & Public School">S.K Concept & Public School</option>
+            <option value="S.K Concept Coaching Center - Ingohta">S.K Concept Coaching Center - Ingohta</option>
+            <option value="S.K Concept Academy - Bidokhar Purai">S.K Concept Academy - Bidokhar Purai</option>
+            <option value="custom">अन्य नया नाम दर्ज करें...</option>
+        </select>
+    </div>
+
+    <div class="form-group" id="customSchoolGroup" style="display: none;">
+        <label for="customSchoolName">नया स्कूल / संस्थान नाम:</label>
+        <div style="display: flex; gap: 10px;">
+            <input type="text" id="customSchoolName" placeholder="संस्थान का पूरा नाम लिखें" oninput="applySchoolLogo()">
+            <button type="button" onclick="saveCustomSchool()" style="width: 150px; margin-top: 0;">सेव करें</button>
+        </div>
+    </div>
+
+    <!-- स्कूल के अनुसार लोगो -->
+    <div class="form-group" id="logoGroup">
+        <label>स्कूल का लोगो (School Logo):</label>
+        <div class="logo-upload">
+            <img id="logoPreview" class="logo-thumb js-school-logo" src="logo-512.png" alt="स्कूल लोगो">
+            <div>
+                <div class="logo-upload-actions">
+                    <label class="upload-label" for="logoUpload">लोगो अपलोड करें</label>
+                    <input type="file" id="logoUpload" accept="image/*" onchange="handleLogoUpload(event)">
+                    <button type="button" class="logo-remove" id="logoRemoveBtn" onclick="removeSchoolLogo()">डिफ़ॉल्ट लोगो पर लौटें</button>
+                </div>
+                <p class="logo-hint" id="logoHint">चुने हुए स्कूल के लिए लोगो सेव होगा और मार्कशीट में छपेगा।</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="marks-grid">
+        <div class="form-group">
+            <label for="studentName">छात्र का नाम:</label>
+            <input type="text" id="studentName" placeholder="पूरा नाम दर्ज करें">
+        </div>
+        <div class="form-group">
+            <label for="rollNo">अनुक्रमांक (Roll No):</label>
+            <input type="text" id="rollNo" placeholder="रोल नंबर दर्ज करें">
+        </div>
+    </div>
+
+    <div class="marks-grid">
+        <div class="form-group">
+            <label for="fatherName">पिता का नाम:</label>
+            <input type="text" id="fatherName" placeholder="पिता का नाम दर्ज करें">
+        </div>
+        <div class="form-group">
+            <label for="motherName">माता का नाम:</label>
+            <input type="text" id="motherName" placeholder="माता का नाम दर्ज करें">
+        </div>
+    </div>
+
+    <div class="marks-grid">
+        <div class="form-group">
+            <label for="classGrade">कक्षा (Class):</label>
+            <select id="classGrade">
+                <option value="">कक्षा चुनें</option>
+                <option>कक्षा 1</option>
+                <option>कक्षा 2</option>
+                <option>कक्षा 3</option>
+                <option>कक्षा 4</option>
+                <option>कक्षा 5</option>
+                <option>कक्षा 6</option>
+                <option>कक्षा 7</option>
+                <option>कक्षा 8</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="studentDob">जन्म तिथि (Date of Birth):</label>
+            <input type="date" id="studentDob">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="examTerm">परीक्षा का प्रकार:</label>
+        <input type="text" id="examTerm" value="वार्षिक परीक्षा 2026">
+    </div>
+
+    <div class="form-group">
+        <label>छात्र की फ़ोटो (Student Photo):</label>
+        <div class="photo-upload">
+            <div class="photo-frame">
+                <span id="photoPlaceholder">फ़ोटो</span>
+                <img id="studentPhotoPreview" alt="छात्र फ़ोटो" hidden>
+            </div>
+            <div>
+                <div class="logo-upload-actions">
+                    <label class="upload-label" for="studentPhotoInput">फ़ोटो अपलोड करें</label>
+                    <input type="file" id="studentPhotoInput" accept="image/*" onchange="handleStudentPhoto(event)">
+                    <button type="button" class="logo-remove" id="studentPhotoRemove" onclick="removeStudentPhoto()">फ़ोटो हटाएँ</button>
+                </div>
+                <p class="logo-hint">यह फ़ोटो मार्कशीट में छात्र जानकारी के साथ दिखेगी। फ़ोटो अपने आप सेव हो जाती है — अगली बार खोलने पर वापस मिलेगी।</p>
+            </div>
+        </div>
+    </div>
+
+    <h3>विषयवार प्राप्तांक</h3>
+    <p class="subject-hint">हर विषय में टेस्ट (10) + अर्धवार्षिक (20) + वार्षिक (70) = कुल 100 अंक</p>
+    <div class="subject-head">
+        <span>विषय (Subject)</span>
+        <span>टेस्ट<br>(10)</span>
+        <span>अर्धवार्षिक<br>(20)</span>
+        <span>वार्षिक<br>(70)</span>
+        <span></span>
+    </div>
+    <div id="subjectRows"></div>
+    <button type="button" class="btn-add" onclick="addSubjectRow()">+ नया विषय जोड़ें</button>
+
+    <div class="form-group">
+        <label for="teacherRemarks">शिक्षक की टिप्पणी (Teacher's Remarks):</label>
+        <input type="text" id="teacherRemarks" value="उत्कृष्ट प्रदर्शन, आगे भी ऐसे ही मेहनत करें!" placeholder="रिमार्क लिखें">
+    </div>
+
+    <div class="btn-group">
+        <button onclick="generateReportCard()">रिजल्ट और मार्कशीट बनाएं</button>
+        <button class="btn-secondary" onclick="resetForm()">फॉर्म साफ़ करें</button>
+    </div>
+
+    <!-- Generated Report Card View -->
+    <div id="reportCard">
+        <div class="school-header">
+            <img src="logo-512.png" alt="S.K Concept Logo" id="cardLogo" class="card-logo js-school-logo">
+            <h2 id="cardSchoolName" style="margin: 0; color: var(--brand-navy);"></h2>
+            <p id="cardExamTerm" style="margin: 5px 0; font-weight: bold; color: var(--brand-blue);"></p>
+        </div>
+        
+        <div class="student-block">
+            <div class="student-info">
+                <div><strong>छात्र का नाम:</strong> <span id="cardName"></span></div>
+                <div><strong>रोल नंबर:</strong> <span id="cardRoll"></span></div>
+                <div><strong>पिता का नाम:</strong> <span id="cardFather"></span></div>
+                <div><strong>माता का नाम:</strong> <span id="cardMother"></span></div>
+                <div><strong>कक्षा:</strong> <span id="cardClass"></span></div>
+                <div><strong>जन्म तिथि:</strong> <span id="cardDob"></span></div>
+                <div><strong>सत्र:</strong> 2025-26</div>
+            </div>
+            <div class="student-photo-box" id="cardPhotoBox">
+                <img id="cardStudentPhoto" alt="छात्र की फ़ोटो">
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>विषय (Subject)</th>
+                    <th>टेस्ट<br>(10)</th>
+                    <th>अर्धवार्षिक<br>(20)</th>
+                    <th>वार्षिक<br>(70)</th>
+                    <th>कुल<br>(100)</th>
+                    <th>ग्रेड (Grade)</th>
+                </tr>
+            </thead>
+            <tbody id="cardTableBody">
+                <!-- डेटा यहाँ लोड होगा -->
+            </tbody>
+        </table>
+
+        <div class="result-summary">
+            <p>कुल प्राप्तांक: <span id="cardTotal"></span> / <span id="cardMaxTotal"></span></p>
+            <p>प्रतिशत (Percentage): <span id="cardPercentage"></span>%</p>
+            <p>समग्र ग्रेड (Overall Grade): <span id="cardGrade"></span></p>
+            <p>अंतिम परिणाम: <span id="cardStatus"></span></p>
+            <p style="margin-top: 10px; color: #555;">शिक्षक की टिप्पणी: <span id="cardRemarkText" style="font-weight: normal;"></span></p>
+        </div>
+
+        <div class="signatures">
+            <div>हस्ताक्षर कक्षा अध्यापक</div>
+            <div>हस्ताक्षर प्रधानाचार्य / संचालक</div>
+        </div>
+
+        <div class="card-actions">
+            <button class="pdf-btn" id="pdfBtn" onclick="downloadPDF()">PDF डाउनलोड करें</button>
+            <button class="png-btn" id="pngBtn" onclick="downloadPNG()">इमेज (PNG) डाउनलोड</button>
+            <button class="print-btn" onclick="window.print()">प्रिंट करें</button>
+        </div>
+        <p class="download-status" id="downloadStatus" role="status"></p>
+    </div>
+</div>
+
+<script src="html2pdf.bundle.min.js"></script>
+<script>
+    const DEFAULT_LOGO = 'logo-512.png';
+    const LOGO_KEY_PREFIX = 'sk_school_logo:';
+
+    // चुने हुए स्कूल का नाम (custom हो तो टाइप किया हुआ नाम)
+    function getSelectedSchoolName() {
+        const select = document.getElementById('schoolSelect');
+        if(select.value === 'custom') {
+            return document.getElementById('customSchoolName').value.trim();
+        }
+        return select.value;
+    }
+
+    function readSchoolLogo(school) {
+        if(!school) return null;
+        try {
+            return localStorage.getItem(LOGO_KEY_PREFIX + school);
+        } catch(e) {
+            return null;
+        }
+    }
+
+    // स्कूल बदलते ही उसका लोगो हेडर, प्रीव्यू और मार्कशीट में लगाना
+    function applySchoolLogo() {
+        const school = getSelectedSchoolName();
+        const savedLogo = readSchoolLogo(school);
+        const logoSrc = savedLogo || DEFAULT_LOGO;
+
+        document.querySelectorAll('.js-school-logo').forEach(function(img) {
+            img.src = logoSrc;
+        });
+
+        const icon = document.querySelector('link[rel="icon"]');
+        if(icon) icon.href = logoSrc;
+
+        const removeBtn = document.getElementById('logoRemoveBtn');
+        if(removeBtn) removeBtn.style.display = savedLogo ? 'inline-block' : 'none';
+
+        const hint = document.getElementById('logoHint');
+        if(hint) {
+            hint.innerText = savedLogo
+                ? 'इस स्कूल का अपना लोगो सेव है — मार्कशीट में यही छपेगा।'
+                : 'चुने हुए स्कूल के लिए लोगो सेव होगा और मार्कशीट में छपेगा।';
+        }
+    }
+
+    function handleLogoUpload(event) {
+        const input = event.target;
+        const file = input.files && input.files[0];
+        if(!file) return;
+
+        const school = getSelectedSchoolName();
+        if(!school) {
+            alert('पहले स्कूल चुनें या नया स्कूल नाम दर्ज कर सेव करें, फिर लोगो अपलोड करें।');
+            input.value = '';
+            return;
+        }
+
+        if(!file.type || !file.type.startsWith('image/')) {
+            alert('कृपया सिर्फ़ इमेज फ़ाइल (PNG, JPG, WEBP) चुनें।');
+            input.value = '';
+            return;
+        }
+
+        if(file.size > 8 * 1024 * 1024) {
+            alert('इमेज 8MB से बड़ी है। कृपया छोटी इमेज चुनें।');
+            input.value = '';
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function() {
+            const image = new Image();
+            image.onload = function() {
+                // बड़ी इमेज को 512px तक छोटा करके सेव करना (स्टोरेज बचाने के लिए)
+                const maxSide = 512;
+                const scale = Math.min(1, maxSide / Math.max(image.width, image.height));
+                const width = Math.max(1, Math.round(image.width * scale));
+                const height = Math.max(1, Math.round(image.height * scale));
+
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+                canvas.getContext('2d').drawImage(image, 0, 0, width, height);
+
+                let dataUrl = canvas.toDataURL('image/webp', 0.92);
+                if(!dataUrl.startsWith('data:image')) {
+                    dataUrl = canvas.toDataURL('image/png');
+                }
+
+                try {
+                    localStorage.setItem(LOGO_KEY_PREFIX + school, dataUrl);
+                } catch(e) {
+                    alert('लोगो सेव नहीं हो सका — ब्राउज़र स्टोरेज भर गई है। थोड़ा छोटा लोगो चुनें।');
+                    input.value = '';
+                    return;
+                }
+
+                applySchoolLogo();
+                input.value = '';
+            };
+            image.onerror = function() {
+                alert('यह इमेज फ़ाइल खोली नहीं जा सकी। कृपया दूसरी फ़ाइल चुनें।');
+                input.value = '';
+            };
+            image.src = reader.result;
+        };
+        reader.onerror = function() {
+            alert('फ़ाइल पढ़ी नहीं जा सकी।');
+            input.value = '';
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function removeSchoolLogo() {
+        const school = getSelectedSchoolName();
+        if(!school) return;
+
+        if(!confirm('इस स्कूल का अपलोड किया हुआ लोगो हटाकर डिफ़ॉल्ट लोगो लगाएँ?')) return;
+
+        try {
+            localStorage.removeItem(LOGO_KEY_PREFIX + school);
+        } catch(e) {}
+        applySchoolLogo();
+    }
+
+    // ===== विषय जोड़ने / हटाने की सुविधा =====
+    const DEFAULT_SUBJECTS = [
+        'हिन्दी (Hindi)',
+        'अंग्रेजी (English)',
+        'गणित (Mathematics)',
+        'विज्ञान (Science)',
+        'सामाजिक विज्ञान (Social Science)'
+    ];
+
+    function escapeHtml(value) {
+        return String(value).replace(/[&<>"']/g, function(ch) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch];
+        });
+    }
+
+    function createSubjectRow(name) {
+        const row = document.createElement('div');
+        row.className = 'subject-row';
+        row.innerHTML =
+            '<input type="text" class="sub-name" placeholder="विषय का नाम" value="' + escapeHtml(name || '') + '">' +
+            '<input type="number" class="sub-t1" min="0" max="10" step="0.5" inputmode="decimal" placeholder="0-10">' +
+            '<input type="number" class="sub-t2" min="0" max="20" step="0.5" inputmode="decimal" placeholder="0-20">' +
+            '<input type="number" class="sub-t3" min="0" max="70" step="0.5" inputmode="decimal" placeholder="0-70">' +
+            '<button type="button" class="row-remove" title="विषय हटाएँ" onclick="removeSubjectRow(this)">×</button>';
+        return row;
+    }
+
+    function addSubjectRow(name) {
+        const container = document.getElementById('subjectRows');
+        const row = createSubjectRow(name || '');
+        container.appendChild(row);
+        if(!name) row.querySelector('.sub-name').focus();
+    }
+
+    function removeSubjectRow(button) {
+        const rows = document.querySelectorAll('#subjectRows .subject-row');
+        if(rows.length <= 1) {
+            alert('कम से कम एक विषय रहना ज़रूरी है।');
+            return;
+        }
+        button.closest('.subject-row').remove();
+    }
+
+    function renderSubjectRows(list) {
+        const container = document.getElementById('subjectRows');
+        container.innerHTML = '';
+        list.forEach(function(name) {
+            container.appendChild(createSubjectRow(name));
+        });
+    }
+
+    // ===== छात्र की फ़ोटो =====
+    let studentPhotoData = null;
+    const STUDENT_PHOTO_KEY = 'sk_student_photo';
+
+    function saveStudentPhoto() {
+        try {
+            if(studentPhotoData) {
+                localStorage.setItem(STUDENT_PHOTO_KEY, studentPhotoData);
+            } else {
+                localStorage.removeItem(STUDENT_PHOTO_KEY);
+            }
+        } catch(err) {
+            console.warn('फ़ोटो सेव नहीं हो सकी:', err);
+        }
+    }
+
+    function loadSavedStudentPhoto() {
+        try {
+            const saved = localStorage.getItem(STUDENT_PHOTO_KEY);
+            if(saved && saved.startsWith('data:image')) {
+                studentPhotoData = saved;
+                applyStudentPhoto();
+            }
+        } catch(err) {
+            console.warn('सेव की गई फ़ोटो पढ़ी नहीं जा सकी:', err);
+        }
+    }
+
+    function applyStudentPhoto() {
+        const preview = document.getElementById('studentPhotoPreview');
+        const placeholder = document.getElementById('photoPlaceholder');
+        const removeBtn = document.getElementById('studentPhotoRemove');
+        if(!preview) return;
+
+        if(studentPhotoData) {
+            preview.src = studentPhotoData;
+            preview.hidden = false;
+            placeholder.style.display = 'none';
+            removeBtn.style.display = 'inline-block';
+        } else {
+            preview.removeAttribute('src');
+            preview.hidden = true;
+            placeholder.style.display = '';
+            removeBtn.style.display = 'none';
+        }
+    }
+
+    function handleStudentPhoto(event) {
+        const input = event.target;
+        const file = input.files && input.files[0];
+        if(!file) return;
+
+        if(!file.type || !file.type.startsWith('image/')) {
+            alert('कृपया सिर्फ़ इमेज फ़ाइल (PNG, JPG, WEBP) चुनें।');
+            input.value = '';
+            return;
+        }
+
+        if(file.size > 8 * 1024 * 1024) {
+            alert('फ़ोटो 8MB से बड़ी है। कृपया छोटी फ़ोटो चुनें।');
+            input.value = '';
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function() {
+            const image = new Image();
+            image.onload = function() {
+                const maxSide = 600;
+                const scale = Math.min(1, maxSide / Math.max(image.width, image.height));
+                const width = Math.max(1, Math.round(image.width * scale));
+                const height = Math.max(1, Math.round(image.height * scale));
+
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+                canvas.getContext('2d').drawImage(image, 0, 0, width, height);
+
+                let dataUrl = canvas.toDataURL('image/webp', 0.9);
+                if(!dataUrl.startsWith('data:image')) {
+                    dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+                }
+
+                studentPhotoData = dataUrl;
+                applyStudentPhoto();
+                saveStudentPhoto();
+                input.value = '';
+            };
+            image.onerror = function() {
+                alert('यह इमेज फ़ाइल खोली नहीं जा सकी। कृपया दूसरी फ़ाइल चुनें।');
+                input.value = '';
+            };
+            image.src = reader.result;
+        };
+        reader.onerror = function() {
+            alert('फ़ाइल पढ़ी नहीं जा सकी।');
+            input.value = '';
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function removeStudentPhoto() {
+        if(!studentPhotoData) return;
+        if(!confirm('छात्र की फ़ोटो हटा दें?')) return;
+        studentPhotoData = null;
+        applyStudentPhoto();
+        saveStudentPhoto();
+    }
+
+    // पेज लोड होने पर लोकल स्टोरेज से स्कूल का नाम चेक करना
+    window.onload = function() {
+        let savedSchool = localStorage.getItem('sk_selected_school');
+        if(savedSchool === 'custom') {
+            savedSchool = null;
+            localStorage.removeItem('sk_selected_school');
+        }
+        if(savedSchool) {
+            let select = document.getElementById('schoolSelect');
+            let optionExists = Array.from(select.options).some(option => option.value === savedSchool);
+            if(!optionExists) {
+                let newOpt = document.createElement('option');
+                newOpt.value = savedSchool;
+                newOpt.textContent = savedSchool;
+                select.insertBefore(newOpt, select.lastElementChild);
+            }
+            select.value = savedSchool;
+        }
+        renderSubjectRows(DEFAULT_SUBJECTS);
+        applyStudentPhoto();
+        loadSavedStudentPhoto();
+        applySchoolLogo();
+    };
+
+    function handleSchoolSelection() {
+        let select = document.getElementById('schoolSelect');
+        let customGroup = document.getElementById('customSchoolGroup');
+        if(select.value === 'custom') {
+            customGroup.style.display = 'block';
+        } else {
+            customGroup.style.display = 'none';
+            localStorage.setItem('sk_selected_school', select.value);
+        }
+        applySchoolLogo();
+    }
+
+    function saveCustomSchool() {
+        let customInput = document.getElementById('customSchoolName').value.trim();
+        if(!customInput) {
+            alert('कृपया संस्थान का सही नाम दर्ज करें!');
+            return;
+        }
+        let select = document.getElementById('schoolSelect');
+        let newOpt = document.createElement('option');
+        newOpt.value = customInput;
+        newOpt.textContent = customInput;
+        select.insertBefore(newOpt, select.lastElementChild);
+        select.value = customInput;
+        localStorage.setItem('sk_selected_school', customInput);
+        document.getElementById('customSchoolGroup').style.display = 'none';
+        document.getElementById('customSchoolName').value = '';
+        applySchoolLogo();
+        alert('स्कूल का नाम सफलतापूर्वक सेव कर लिया गया है!');
+    }
+
+    function calculateGrade(marks) {
+        if (marks >= 90) return 'A+ (उत्कृष्ट)';
+        if (marks >= 75) return 'A (बहुत अच्छा)';
+        if (marks >= 60) return 'B (अच्छा)';
+        if (marks >= 45) return 'C (संतोषजनक)';
+        if (marks >= 33) return 'D (उत्तीर्ण)';
+        return 'E (अनुत्तीर्ण / प्रयास करें)';
+    }
+
+    function collectSubjects() {
+        const rows = Array.from(document.querySelectorAll('#subjectRows .subject-row'));
+        const subjects = [];
+        const limits = [10, 20, 70];
+        const labels = ['टेस्ट', 'अर्धवार्षिक', 'वार्षिक'];
+
+        for(const row of rows) {
+            const nameInput = row.querySelector('.sub-name');
+            const name = nameInput.value.trim();
+            const values = [
+                row.querySelector('.sub-t1').value.trim(),
+                row.querySelector('.sub-t2').value.trim(),
+                row.querySelector('.sub-t3').value.trim()
+            ];
+
+            if(!name && values.every(function(v) { return v === ''; })) continue;
+
+            if(!name) {
+                alert('कृपया हर भरी हुई पंक्ति में विषय का नाम लिखें।');
+                nameInput.focus();
+                return null;
+            }
+
+            if(values.some(function(v) { return v === ''; })) {
+                alert('"' + name + '" के टेस्ट, अर्धवार्षिक और वार्षिक (10 + 20 + 70) के अंक भरें।');
+                return null;
+            }
+
+            const marks = values.map(parseFloat);
+            for(let i = 0; i < marks.length; i++) {
+                if(isNaN(marks[i]) || marks[i] < 0 || marks[i] > limits[i]) {
+                    alert('"' + name + '" में ' + labels[i] + ' के अंक 0 से ' + limits[i] + ' के बीच होने चाहिए।');
+                    return null;
+                }
+            }
+
+            subjects.push({
+                name: name,
+                t1: marks[0],
+                t2: marks[1],
+                t3: marks[2],
+                total: marks[0] + marks[1] + marks[2]
+            });
+        }
+
+        if(subjects.length === 0) {
+            alert('कम से कम एक विषय के अंक भरें।');
+            return null;
+        }
+        return subjects;
+    }
+
+    function formatDate(isoDate) {
+        if(!isoDate) return '';
+        const parts = isoDate.split('-');
+        if(parts.length !== 3) return isoDate;
+        return parts[2] + '/' + parts[1] + '/' + parts[0];
+    }
+
+    function generateReportCard() {
+        const schoolSelect = document.getElementById('schoolSelect');
+        const school = schoolSelect.value === 'custom'
+            ? document.getElementById('customSchoolName').value.trim()
+            : schoolSelect.value;
+        const name = document.getElementById('studentName').value.trim();
+        const roll = document.getElementById('rollNo').value.trim();
+        const father = document.getElementById('fatherName').value.trim();
+        const mother = document.getElementById('motherName').value.trim();
+        const dobRaw = document.getElementById('studentDob').value;
+        const dob = formatDate(dobRaw);
+        const className = document.getElementById('classGrade').value;
+        const exam = document.getElementById('examTerm').value.trim();
+        const remarks = document.getElementById('teacherRemarks').value;
+
+        if(!school) {
+            alert("कृपया स्कूल / संस्थान का नाम दर्ज करें या सूची से चुनें!");
+            return;
+        }
+
+        if(!name || !roll) {
+            alert("कृपया छात्र का नाम और रोल नंबर दर्ज करें!");
+            return;
+        }
+
+        const subjects = collectSubjects();
+        if(!subjects) return;
+
+        let totalMarks = 0;
+        let maxTotal = 0;
+        let tableHTML = '';
+        let isFailed = false;
+
+        subjects.forEach(function(sub) {
+            totalMarks += sub.total;
+            maxTotal += 100;
+            if(sub.total < 33) isFailed = true;
+            tableHTML += '<tr>' +
+                '<td>' + escapeHtml(sub.name) + '</td>' +
+                '<td>' + sub.t1 + '</td>' +
+                '<td>' + sub.t2 + '</td>' +
+                '<td>' + sub.t3 + '</td>' +
+                '<td><strong>' + sub.total + '</strong></td>' +
+                '<td>' + calculateGrade(sub.total) + '</td>' +
+                '</tr>';
+        });
+
+        const percentage = maxTotal > 0 ? (totalMarks / maxTotal) * 100 : 0;
+        const overallGrade = calculateGrade(percentage);
+        const status = isFailed ? "पुनः परीक्षा आवश्यक (Fail)" : "सफलतापूर्वक उत्तीर्ण (Pass)";
+
+        document.getElementById('cardLogo').src = readSchoolLogo(school) || DEFAULT_LOGO;
+        document.getElementById('cardSchoolName').innerText = school;
+        document.getElementById('cardExamTerm').innerText = exam;
+        document.getElementById('cardName').innerText = name;
+        document.getElementById('cardRoll').innerText = roll;
+        document.getElementById('cardFather').innerText = father || '—';
+        document.getElementById('cardMother').innerText = mother || '—';
+        document.getElementById('cardDob').innerText = dob || '—';
+        document.getElementById('cardClass').innerText = className || 'लागू नहीं';
+        document.getElementById('cardTableBody').innerHTML = tableHTML;
+        document.getElementById('cardTotal').innerText = Number(totalMarks.toFixed(2));
+        document.getElementById('cardMaxTotal').innerText = maxTotal;
+        document.getElementById('cardPercentage').innerText = percentage.toFixed(2);
+        document.getElementById('cardGrade').innerText = overallGrade;
+        document.getElementById('cardRemarkText').innerText = remarks;
+        
+        let statusElement = document.getElementById('cardStatus');
+        statusElement.innerText = status;
+        statusElement.style.color = isFailed ? "red" : "green";
+
+        const photoBox = document.getElementById('cardPhotoBox');
+        const cardPhoto = document.getElementById('cardStudentPhoto');
+        if(studentPhotoData) {
+            cardPhoto.src = studentPhotoData;
+            photoBox.style.display = 'block';
+        } else {
+            cardPhoto.removeAttribute('src');
+            photoBox.style.display = 'none';
+        }
+
+        document.getElementById('reportCard').style.display = 'block';
+        window.scrollTo({ top: document.getElementById('reportCard').offsetTop, behavior: 'smooth' });
+    }
+
+    /* ===== PDF डाउनलोड ===== */
+    let pdfLibPromise = null;
+
+    function loadPdfLib() {
+        if(window.html2pdf) return Promise.resolve(true);
+        if(pdfLibPromise) return pdfLibPromise;
+        pdfLibPromise = new Promise(function(resolve) {
+            const urls = [
+                'html2pdf.bundle.min.js',
+                'https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js',
+                'https://unpkg.com/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js'
+            ];
+            let i = 0;
+            function next() {
+                if(i >= urls.length) {
+                    resolve(false);
+                    return;
+                }
+                const s = document.createElement('script');
+                s.src = urls[i++];
+                s.onload = function() { resolve(!!window.html2pdf); };
+                s.onerror = next;
+                document.head.appendChild(s);
+            }
+            next();
+        });
+        return pdfLibPromise;
+    }
+
+    function safeFileName(text) {
+        return (text || '').trim().replace(/[\\/:*?"<>|]+/g, '').replace(/\s+/g, '-').slice(0, 40);
+    }
+
+    function setStatus(msg, isError) {
+        const el = document.getElementById('downloadStatus');
+        if(!el) return;
+        el.textContent = msg || '';
+        el.style.color = isError ? '#b3261e' : '#0b1a3a';
+    }
+
+    function triggerDownload(blob, fileName) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        a.rel = 'noopener';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(function() { URL.revokeObjectURL(url); }, 20000);
+    }
+
+    function fileBaseName() {
+        const name = safeFileName(document.getElementById('cardName').textContent) || 'student';
+        const cls = safeFileName(document.getElementById('cardClass').textContent);
+        return 'marksheet-' + name + (cls ? '-' + cls : '');
+    }
+
+    function readyCard() {
+        const card = document.getElementById('reportCard');
+        if(!card || getComputedStyle(card).display === 'none') {
+            alert('पहले "रिजल्ट और मार्कशीट बनाएं" पर क्लिक करें, फिर डाउनलोड करें।');
+            return null;
+        }
+        return card;
+    }
+
+    async function downloadPDF() {
+        const card = readyCard();
+        if(!card) return;
+
+        const btn = document.getElementById('pdfBtn');
+        const label = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = 'PDF बन रहा है…';
+        setStatus('PDF तैयार हो रहा है, कृपया रुकें…');
+        card.classList.add('exporting');
+
+        try {
+            const ok = await loadPdfLib();
+            if(!ok) throw new Error('PDF लाइब्रेरी लोड नहीं हुई');
+
+            const blob = await html2pdf().set({
+                margin: [8, 8, 8, 8],
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: {
+                    scale: 2,
+                    useCORS: true,
+                    backgroundColor: '#ffffff',
+                    scrollX: 0,
+                    scrollY: 0
+                },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak: { mode: ['css', 'legacy'], avoid: ['tr', '.result-summary', '.signatures'] }
+            }).from(card).outputPdf('blob');
+
+            triggerDownload(blob, fileBaseName() + '.pdf');
+            setStatus('✓ PDF डाउनलोड हो गया: ' + fileBaseName() + '.pdf');
+        } catch(err) {
+            console.error(err);
+            setStatus('PDF नहीं बन सका: ' + err.message + ' — "प्रिंट करें" आज़माएँ।', true);
+        } finally {
+            card.classList.remove('exporting');
+            btn.disabled = false;
+            btn.textContent = label;
+        }
+    }
+
+    async function downloadPNG() {
+        const card = readyCard();
+        if(!card) return;
+
+        const btn = document.getElementById('pngBtn');
+        const label = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = 'इमेज बन रही है…';
+        setStatus('इमेज तैयार हो रही है, कृपया रुकें…');
+        card.classList.add('exporting');
+
+        try {
+            const ok = await loadPdfLib();
+            if(!ok || !window.html2pdf) throw new Error('इमेज लाइब्रेरी लोड नहीं हुई');
+
+            const canvas = await html2pdf()
+                .set({
+                    html2canvas: {
+                        scale: 2,
+                        useCORS: true,
+                        backgroundColor: '#ffffff',
+                        scrollX: 0,
+                        scrollY: 0
+                    }
+                })
+                .from(card)
+                .toCanvas()
+                .get('canvas');
+
+            const blob = await new Promise(function(resolve) { canvas.toBlob(resolve, 'image/png'); });
+            if(!blob) throw new Error('इमेज नहीं बनी');
+
+            triggerDownload(blob, fileBaseName() + '.png');
+            setStatus('✓ इमेज डाउनलोड हो गई: ' + fileBaseName() + '.png');
+        } catch(err) {
+            console.error(err);
+            setStatus('इमेज नहीं बन सकी: ' + err.message, true);
+        } finally {
+            card.classList.remove('exporting');
+            btn.disabled = false;
+            btn.textContent = label;
+        }
+    }
+
+    function resetForm() {
+        document.getElementById('studentName').value = '';
+        document.getElementById('rollNo').value = '';
+        document.getElementById('fatherName').value = '';
+        document.getElementById('motherName').value = '';
+        document.getElementById('studentDob').value = '';
+        document.getElementById('classGrade').value = '';
+        document.querySelectorAll('#subjectRows .subject-row').forEach(function(row) {
+            row.querySelectorAll('input[type="number"]').forEach(function(input) {
+                input.value = '';
+            });
+        });
+        studentPhotoData = null;
+        applyStudentPhoto();
+        saveStudentPhoto();
+        document.getElementById('reportCard').style.display = 'none';
+        // Reset display values
+        document.getElementById('cardTotal').innerText = '';
+        document.getElementById('cardMaxTotal').innerText = '';
+        document.getElementById('cardPercentage').innerText = '';
+        document.getElementById('cardGrade').innerText = '';
+        document.getElementById('cardStatus').innerText = '';
+    }
+</script>
+
+</body>
+</html>

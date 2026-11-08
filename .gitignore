@@ -1,0 +1,13 @@
+# Firebase deploy cache
+.firebase/
+
+# Playwright CLI artifacts
+.playwright-cli/
+
+# Stray accidental file
+'
+
+# Logs / OS junk
+*.log
+.DS_Store
+Thumbs.db
