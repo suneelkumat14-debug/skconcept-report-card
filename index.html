@@ -1174,6 +1174,16 @@
         applyStudentPhoto();
         loadSavedStudentPhoto();
         applySchoolLogo();
+        // PDF लाइब्रेरी पहले से लोड कर लें ताकि बटन दबाते ही फ़ाइल बने
+        setTimeout(function() {
+            try {
+                if(!window.html2pdf && typeof loadPdfLib === 'function') {
+                    loadPdfLib();
+                }
+            } catch (err) {
+                console.warn('PDF लाइब्रेरी प्री-लोड नहीं हुई:', err);
+            }
+        }, 1500);
     };
 
     function handleSchoolSelection() {
@@ -1400,7 +1410,7 @@
         el.style.color = isError ? '#b3261e' : '#0b1a3a';
     }
 
-    function triggerDownload(blob, fileName) {
+    function triggerDownload(blob, fileName, label) {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
@@ -1409,7 +1419,26 @@
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
-        setTimeout(function() { URL.revokeObjectURL(url); }, 20000);
+        showManualLink(url, fileName, label || 'फाइल');
+        setTimeout(function() { URL.revokeObjectURL(url); }, 60000);
+    }
+
+    function showManualLink(url, fileName, label) {
+        const el = document.getElementById('downloadStatus');
+        if(!el) return;
+        el.innerHTML = '';
+        el.style.color = '#0b1a3a';
+        el.appendChild(document.createTextNode('✓ ' + label + ' तैयार है — '));
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = fileName;
+        link.target = '_blank';
+        link.rel = 'noopener';
+        link.textContent = 'अगर डाउनलोड शुरू न हुआ तो यहाँ क्लिक करें';
+        link.style.color = '#0a49a7';
+        link.style.textDecoration = 'underline';
+        link.style.fontWeight = '700';
+        el.appendChild(link);
     }
 
     function fileBaseName() {
