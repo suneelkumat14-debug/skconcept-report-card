@@ -229,6 +229,7 @@
         .png-btn:hover {
             background-color: #083a86;
         }
+
         .pdf-btn:disabled {
             opacity: .7;
             cursor: progress;
@@ -674,6 +675,12 @@
     </style>
 </head>
 <body>
+    <noscript>
+        <div style="max-width:850px;margin:20px auto;padding:16px;background:#fdecea;color:#b3261e;border:1px solid #f5c2c0;border-radius:8px;font-family:sans-serif;">
+            इस ऐप के लिए JavaScript चालू होना ज़रूरी है। कृपया ब्राउज़र की सेटिंग में JavaScript चालू करें और पेज रिफ्रेश करें।
+        </div>
+    </noscript>
+    <div id="globalErrorBanner" style="display:none;max-width:850px;margin:10px auto;padding:10px 14px;background:#fdecea;color:#b3261e;border:1px solid #f5c2c0;border-radius:8px;font-family:sans-serif;font-size:13px;"></div>
 
 <div class="container">
     <div class="brand">
@@ -869,6 +876,24 @@
 <script>
     const DEFAULT_LOGO = 'logo-512.png';
     const LOGO_KEY_PREFIX = 'sk_school_logo:';
+
+    window.addEventListener('error', function(e) {
+        const banner = document.getElementById('globalErrorBanner');
+        if(banner) {
+            banner.textContent = 'गड़बड़ी: ' + (e && e.message ? e.message : 'अज्ञात त्रुटि') + ' — कृपया पेज रिफ्रेश करें।';
+            banner.style.display = 'block';
+        }
+    });
+
+    window.addEventListener('unhandledrejection', function(e) {
+        const banner = document.getElementById('globalErrorBanner');
+        if(banner) {
+            const reason = e && e.reason;
+            const msg = (reason && reason.message) ? reason.message : String(reason || 'अज्ञात त्रुटि');
+            banner.textContent = 'गड़बड़ी: ' + msg + ' — कृपया पेज रिफ्रेश करें।';
+            banner.style.display = 'block';
+        }
+    });
 
     // चुने हुए स्कूल का नाम (custom हो तो टाइप किया हुआ नाम)
     function getSelectedSchoolName() {
@@ -1456,6 +1481,46 @@
         return card;
     }
 
+    async function makePdfBlob(card) {
+        const ok = await loadPdfLib();
+        if(!ok || !window.html2pdf) {
+            throw new Error('PDF लाइब्रेरी लोड नहीं हुई — इंटरनेट जाँच करें');
+        }
+        return html2pdf().set({
+            margin: [8, 8, 8, 8],
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: {
+                scale: 2,
+                useCORS: true,
+                backgroundColor: '#ffffff',
+                scrollX: 0,
+                scrollY: 0
+            },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+            pagebreak: { mode: ['css', 'legacy'], avoid: ['tr', '.result-summary', '.signatures'] }
+        }).from(card).outputPdf('blob');
+    }
+
+    async function openPdfInNewTab() {
+        const card = readyCard();
+        if(!card) return;
+        const btn = document.getElementById('viewBtn');
+        const label = btn ? btn.textContent : '';
+        if(btn) { btn.disabled = true; btn.textContent = 'PDF बन रहा है...'; }
+        try {
+            const blob = await makePdfBlob(card);
+            const url = URL.createObjectURL(blob);
+            window.open(url, '_blank', 'noopener');
+            setStatus('PDF नई टैब में खोल दिया गया।');
+            setTimeout(function() { URL.revokeObjectURL(url); }, 60000);
+        } catch(err) {
+            console.error(err);
+            setStatus('PDF नहीं खुल सका: ' + err.message + ' — "प्रिंट करें" आज़माएँ।', true);
+        } finally {
+            if(btn) { btn.disabled = false; btn.textContent = label; }
+        }
+    }
+
     async function downloadPDF() {
         const card = readyCard();
         if(!card) return;
@@ -1468,25 +1533,8 @@
         card.classList.add('exporting');
 
         try {
-            const ok = await loadPdfLib();
-            if(!ok) throw new Error('PDF लाइब्रेरी लोड नहीं हुई');
-
-            const blob = await html2pdf().set({
-                margin: [8, 8, 8, 8],
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: {
-                    scale: 2,
-                    useCORS: true,
-                    backgroundColor: '#ffffff',
-                    scrollX: 0,
-                    scrollY: 0
-                },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                pagebreak: { mode: ['css', 'legacy'], avoid: ['tr', '.result-summary', '.signatures'] }
-            }).from(card).outputPdf('blob');
-
-            triggerDownload(blob, fileBaseName() + '.pdf');
-            setStatus('✓ PDF डाउनलोड हो गया: ' + fileBaseName() + '.pdf');
+            const blob = await makePdfBlob(card);
+            triggerDownload(blob, fileBaseName() + '.pdf', 'PDF');
         } catch(err) {
             console.error(err);
             setStatus('PDF नहीं बन सका: ' + err.message + ' — "प्रिंट करें" आज़माएँ।', true);
@@ -1529,8 +1577,7 @@
             const blob = await new Promise(function(resolve) { canvas.toBlob(resolve, 'image/png'); });
             if(!blob) throw new Error('इमेज नहीं बनी');
 
-            triggerDownload(blob, fileBaseName() + '.png');
-            setStatus('✓ इमेज डाउनलोड हो गई: ' + fileBaseName() + '.png');
+            triggerDownload(blob, fileBaseName() + '.png', 'इमेज');
         } catch(err) {
             console.error(err);
             setStatus('इमेज नहीं बन सकी: ' + err.message, true);
